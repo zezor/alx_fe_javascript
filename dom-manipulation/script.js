@@ -8,10 +8,55 @@ let quotes = JSON.parse(localStorage.getItem("quotes")) || [
 const quoteDisplay = document.getElementById("quoteDisplay");
 const newQuoteBtn = document.getElementById("newQuote");
 const addQuoteContainer = document.getElementById("addQuoteContainer");
+const categoryFilter = document.getElementById("categoryFilter");
 
 // Save quotes to localStorage
 function saveQuotes() {
     localStorage.setItem("quotes", JSON.stringify(quotes));
+}
+
+
+// Populate category dropdown dynamically
+function populateCategories() {
+    const categories = [...new Set(quotes.map(q => q.category))];
+
+    categoryFilter.innerHTML = '<option value="all">All Categories</option>';
+
+    categories.forEach(category => {
+        const option = document.createElement("option");
+        option.value = category;
+        option.textContent = category;
+        categoryFilter.appendChild(option);
+    });
+
+    // Restore last selected category
+    const savedCategory = localStorage.getItem("selectedCategory");
+    if (savedCategory) {
+        categoryFilter.value = savedCategory;
+        filterQuotes();
+    }
+}
+
+// Filter quotes based on category
+function filterQuotes() {
+    const selectedCategory = categoryFilter.value;
+    localStorage.setItem("selectedCategory", selectedCategory);
+
+    let filteredQuotes = quotes;
+
+    if (selectedCategory !== "all") {
+        filteredQuotes = quotes.filter(q => q.category === selectedCategory);
+    }
+
+    if (filteredQuotes.length === 0) {
+        quoteDisplay.textContent = "No quotes available for this category.";
+        return;
+    }
+
+    const randomIndex = Math.floor(Math.random() * filteredQuotes.length);
+    const quote = filteredQuotes[randomIndex];
+
+    quoteDisplay.textContent = `"${quote.text}" — ${quote.category}`;
 }
 
 // Display random quote + store session data
@@ -68,6 +113,7 @@ function addQuote() {
 
     quotes.push({ text, category });
     saveQuotes();
+    populateCategories();
 
     document.getElementById("newQuoteText").value = "";
     document.getElementById("newQuoteCategory").value = "";
@@ -113,3 +159,4 @@ newQuoteBtn.addEventListener("click", showRandomQuote);
 // Initialize app
 createAddQuoteForm();
 loadLastQuote();
+populateCategories();
