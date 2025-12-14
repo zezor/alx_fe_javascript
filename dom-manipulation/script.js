@@ -1,8 +1,64 @@
-// Load quotes from localStorage or use default
-let quotes = JSON.parse(localStorage.getItem("quotes")) || [
-    { text: "Knowledge is power.", category: "Education" },
-    { text: "Success is not final; failure is not fatal.", category: "Inspiration" }
-];
+// Constants server URL
+const SERVER_URL = "https://jsonplaceholder.typicode.com/posts";
+
+// fetch quotes from server and sync with localStorage
+async function fetchQuotesFromServer() {
+    try {
+        const response = await fetch(SERVER_URL);
+        const data = await response.json();
+
+        // Convert server posts into quote objects
+        const serverQuotes = data.slice(0, 5).map(post => ({
+            id: post.id,
+            text: post.title,
+            category: "Server",
+            updatedAt: Date.now()
+        }));
+
+        syncWithServer(serverQuotes);
+    } catch (error) {
+        console.error("Error fetching server data:", error);
+    }
+}
+
+// 
+let quotes = JSON.parse(localStorage.getItem("quotes")) || [];
+
+
+// // Load quotes from localStorage or use default
+// let quotes = JSON.parse(localStorage.getItem("quotes")) || [
+//     { text: "Knowledge is power.", category: "Education" },
+//     { text: "Success is not final; failure is not fatal.", category: "Inspiration" }
+// ];
+
+
+
+
+function syncWithServer(serverQuotes) {
+    let conflictsResolved = false;
+
+    serverQuotes.forEach(serverQuote => {
+        const localIndex = quotes.findIndex(
+            local => local.id === serverQuote.id
+        );
+
+        if (localIndex === -1) {
+            // New server quote
+            quotes.push(serverQuote);
+            conflictsResolved = true;
+        } else {
+            // Conflict → server data takes precedence
+            quotes[localIndex] = serverQuote;
+            conflictsResolved = true;
+        }
+    });
+
+    if (conflictsResolved) {
+        localStorage.setItem("quotes", JSON.stringify(quotes));
+        notifyUser("Quotes synced from server. Conflicts resolved.");
+    }
+}
+
 
 // DOM elements
 const quoteDisplay = document.getElementById("quoteDisplay");
@@ -153,10 +209,32 @@ function importFromJsonFile(event) {
     fileReader.readAsText(event.target.files[0]);
 }
 
+
+function notifyUser(message) {
+    const notification = document.getElementById("notification");
+    notification.textContent = message;
+    notification.style.display = "block";
+
+    setTimeout(() => {
+        notification.style.display = "none";
+    }, 4000);
+}
+
+function manualSync() {
+    fetchServerQuotes();
+    notifyUser("Manual sync completed.");
+}
+
+
+
 // Event listeners
 newQuoteBtn.addEventListener("click", showRandomQuote);
+categoryFilter.addEventListener("change", filterQuotes);
+manualSyncBtn.addEventListener("click", manualSync);
 
 // Initialize app
 createAddQuoteForm();
 loadLastQuote();
 populateCategories();
+fetchQuotesFromServer();
+notifyUser();
