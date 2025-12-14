@@ -23,7 +23,26 @@ async function fetchQuotesFromServer() {
 
 // 
 let quotes = JSON.parse(localStorage.getItem("quotes")) || [];
+// Post new quote to server
 
+async function postQuoteToServer(quote) {
+    try {
+        const response = await fetch("https://jsonplaceholder.typicode.com/posts", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(quote)
+        });
+
+        const serverResponse = await response.json();
+        console.log("Posted to server:", serverResponse);
+
+        notifyUser("Quote synced to server successfully.");
+    } catch (error) {
+        console.error("Error posting quote:", error);
+    }
+}
 
 // // Load quotes from localStorage or use default
 // let quotes = JSON.parse(localStorage.getItem("quotes")) || [
@@ -167,15 +186,25 @@ function addQuote() {
         return;
     }
 
-    quotes.push({ text, category });
-    saveQuotes();
-    populateCategories();
+    const newQuote = {
+        id: Date.now(),
+        text: text,
+        category: category,
+        updatedAt: Date.now()
+    };
+
+    quotes.push(newQuote);
+    localStorage.setItem("quotes", JSON.stringify(quotes));
+
+    // ✅ POST quote to mock server
+    postQuoteToServer(newQuote);
 
     document.getElementById("newQuoteText").value = "";
     document.getElementById("newQuoteCategory").value = "";
 
     alert("Quote added successfully!");
 }
+
 
 // Export quotes as JSON file
 function exportQuotes() {
@@ -229,10 +258,12 @@ function manualSync() {
 
 // Event listeners
 newQuoteBtn.addEventListener("click", showRandomQuote);
+addQuoteContainer.addEventListener("submit", addQuote);
 categoryFilter.addEventListener("change", filterQuotes);
 manualSyncBtn.addEventListener("click", manualSync);
 
 // Initialize app
+addQuote()
 createAddQuoteForm();
 loadLastQuote();
 populateCategories();
