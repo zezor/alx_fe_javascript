@@ -14,29 +14,29 @@
             padding: 15px;
             border: 1px solid #ccc;
             font-size: 18px;
+            min-height: 50px;
         }
-        input {
-            margin: 5px 0;
+        input, button {
             padding: 8px;
-            width: 250px;
-        }
-        button {
-            padding: 8px 15px;
-            margin-top: 10px;
-            cursor: pointer;
+            margin: 5px 0;
         }
     </style>
 </head>
 <body>
 
-    <h1>Dynamic Quote Generator</h1>
+<h1>Dynamic Quote Generator</h1>
 
-    <div id="quoteDisplay">Click the button to see a quote</div>
-    <button id="newQuote">Show New Quote</button>
+<div id="quoteDisplay">Click the button to see a quote</div>
+<button id="newQuote">Show New Quote</button>
 
-    <h3>Add a New Quote</h3>
-    <div id="addQuoteContainer"></div>
+<h3>Add a New Quote</h3>
+<div id="addQuoteContainer"></div>
 
-    <script src="script.js"></script>
+<h3>Import / Export Quotes</h3>
+<button onclick="exportQuotes()">Export Quotes (JSON)</button>
+<br><br>
+<input type="file" id="importFile" accept=".json" onchange="importFromJsonFile(event)" />
+
+<script src="script.js"></script>
 </body>
 </html>
