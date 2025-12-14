@@ -269,4 +269,4 @@ loadLastQuote();
 populateCategories();
 fetchQuotesFromServer();
 notifyUser();
-syncQuotes();
+syncQuotes(setInterval, 3000);
