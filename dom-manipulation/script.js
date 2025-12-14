@@ -251,7 +251,7 @@ function notifyUser(message) {
 
 function manualSync() {
     fetchServerQuotes();
-    notifyUser("Manual sync completed.");
+    notifyUser("Quotes synced with server!");
 }
 
 
