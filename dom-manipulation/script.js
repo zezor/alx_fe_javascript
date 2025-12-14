@@ -53,7 +53,7 @@ async function postQuoteToServer(quote) {
 
 
 
-function syncWithServer(serverQuotes) {
+function syncQuotes(serverQuotes) {
     let conflictsResolved = false;
 
     serverQuotes.forEach(serverQuote => {
@@ -263,9 +263,10 @@ categoryFilter.addEventListener("change", filterQuotes);
 manualSyncBtn.addEventListener("click", manualSync);
 
 // Initialize app
-addQuote()
+addQuote();
 createAddQuoteForm();
 loadLastQuote();
 populateCategories();
 fetchQuotesFromServer();
 notifyUser();
+syncQuotes();
